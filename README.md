@@ -13,9 +13,13 @@ AAC, Opus, EAC3 or raw PCM.
 
 ## Features
 
-- **Per-process capture** — pick any running app from the dropdown, or
-  type its `.exe` name and let AudioOBS arm itself ("Wait for:") until
-  the app appears
+- **Per-process capture** — pick any running app from the dropdown.
+  An app only appears once it is actually playing audio; when the list
+  is empty AudioOBS says so and points the way
+- **"Wait for:" with history** — arm AudioOBS against an app that
+  isn't running yet by `.exe` name. The Wait-for field is an editable
+  combo box that remembers the apps you've waited for before, so you
+  can re-pick them from the drop-down instead of retyping
 - **Include child processes** — captures spawned helpers too (Chrome
   audio service, Spotify renderer, etc.)
 - **Sequential / album mode** — auto-splits into individual track files
@@ -30,8 +34,14 @@ AAC, Opus, EAC3 or raw PCM.
   Pure NumPy / FFT under the hood
 - **WASAPI format readout** — sample rate, channel count, sample depth
   and raw data rate of the currently captured source, shown live
-- **Settings persisted** — last source, output folder, codec choice,
-  sequential pause-gap, all stored in `AudioOBS.json` next to the EXE
+- **Startup ffmpeg check** — on launch AudioOBS verifies ffmpeg is
+  reachable. If it isn't, it explains what still works without it
+  (live monitoring) and how to install it
+- **Full save-state** — output folder, codec and bitrate, sequential
+  pause-gap, last source, Wait-for state and history, meter view and
+  window geometry are all stored in `AudioOBS.json` next to the EXE.
+  A missing folder or stale value falls back to a safe default rather
+  than blocking startup
 
 ---
 
@@ -43,6 +53,11 @@ AAC, Opus, EAC3 or raw PCM.
 | Python      | 3.10+ (for running from source) |
 | Audio enc.  | `ffmpeg.exe` on `PATH` (any recent build) |
 | Python deps | `PySide6`, `numpy` |
+
+> Without `ffmpeg`, recording is disabled, but live monitoring — source
+> picking, VU meter, spectrogram and the WASAPI format readout — still
+> works. AudioOBS checks for `ffmpeg` at startup and tells you how to
+> install it if it is missing.
 
 ---
 
@@ -109,6 +124,12 @@ format (48 kHz / 2 ch / float32) and hands it to a callback. The
 Python GUI pipes the PCM straight into a long-lived `ffmpeg`
 subprocess via stdin.
 
+A process only shows up in the source picker once it has an active
+WASAPI audio session — i.e. once it has actually played a sound. An
+app that is open but silent has no session for Windows to enumerate.
+That is what **"Wait for:"** is for: it polls until the named `.exe`
+opens a session and arms recording the moment it does.
+
 VU meter and silence detection use `np.dot(x, x) / N` for one-pass
 RMS. The spectrogram does `np.fft.rfft` on a Hann-windowed 2048-sample
 slice each tick, maps log-frequency bins to display rows through a
@@ -134,6 +155,7 @@ AudioOBS/
 ├── build.py                    # Nuitka driver
 ├── build_onefile.bat
 ├── build_standalone.bat
+├── CHANGELOG.md                # version history
 ├── LICENSE                     # GPL-2.0
 └── README.md                   # this file
 ```
