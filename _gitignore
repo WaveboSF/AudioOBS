@@ -1,0 +1,88 @@
+# =====================================================================
+# AudioOBS .gitignore
+# =====================================================================
+
+# ---- Python ---------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.env
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- C++ build artefacts -------------------------------------------
+build/
+out/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+*.dir/
+*.vcxproj.user
+*.vcxproj.filters
+x64/
+Win32/
+Debug/
+Release/
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# ---- Built artefacts that ship in /python/ -------------------------
+# wincaptureaudio.dll is the BUILD OUTPUT - the source is in /src/.
+# Don't track the binary in git; build it via CMake on each clone.
+python/wincaptureaudio.dll
+
+# ---- Nuitka / PyInstaller outputs ----------------------------------
+build_dist/
+dist/
+*.spec
+
+# ---- AudioOBS user state -------------------------------------------
+# Per-user settings file (output folder, last source, codec choices).
+# Generated on first launch right next to the script / EXE.
+AudioOBS.json
+python/AudioOBS.json
+
+# ---- Local maintenance/dev tools (not for public repo) -------------
+# These batches are useful for the developer's own setup but
+# uninteresting for users cloning the repo.
+cleanup_layout.bat
+tree_project.bat
+tree.txt
+
+# ---- Private handover / notes (not for public repo) ----------------
+# Anything matching AudioOBS_Handover*.md is a session-handover note
+# meant for the maintainer's own re-onboarding, not for public eyes.
+AudioOBS_Handover*.md
+Toucan_Icon_Workflow.md
+_docs/
+
+# ---- Reference archives (not for public repo) ----------------------
+# Original upstream source ZIP kept locally as reference.
+win-capture-audio-main.zip
+*.zip
+
+# ---- IDE / editor metadata -----------------------------------------
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---- vcpkg / package managers --------------------------------------
+vcpkg_installed/
